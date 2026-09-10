@@ -665,9 +665,11 @@ function slugify(s){
 const CATALOG_ITEMS = [];
 const catalogWrap = document.getElementById('catalogWrap');
 Object.entries(CATALOG).forEach(([cat, items])=>{
+  const visibleItems = items.filter(i=>typeof i==='string'||i.active!==false);
+  if(visibleItems.length===0) return;
   const group = document.createElement('div');
   group.className = 'catgroup';
-  group.innerHTML = `<h3>${cat}</h3><div class="catlist">${items.map(i=>{
+  group.innerHTML = `<h3>${cat}</h3><div class="catlist">${visibleItems.map(i=>{
     const name = typeof i === 'string' ? i : i.n;
     const price = typeof i === 'string' ? null : i.p;
     const unit = (typeof i === 'object' && i.u) ? i.u : 'kg';
@@ -686,7 +688,7 @@ function findItem(id){
 
 // ---------- Render products ----------
 const grid = document.getElementById('productGrid');
-PRODUCTS.forEach(p=>{
+PRODUCTS.filter(p=>p.active!==false).forEach(p=>{
   const card = document.createElement('div');
   card.className = 'card';
   card.innerHTML = `
