@@ -462,13 +462,13 @@
     </div>
     <div class="step">
       <div class="num">2</div>
-      <h3>Réservez votre commande</h3>
-      <p>Laissez vos coordonnées — on vous confirme la disponibilité et une date de cueillette par texto ou courriel.</p>
+      <h3>Payez en ligne</h3>
+      <p>Laissez vos coordonnées et payez directement sur le site, par carte. Vous recevez une confirmation immédiate.</p>
     </div>
     <div class="step">
       <div class="num">3</div>
-      <h3>Cueillette et paiement</h3>
-      <p>Vous passez chercher votre commande au point de cueillette : 220, boulevard Wilfrid-Hamel, Québec (QC) G1L 5A7 <em>(adresse provisoire)</em>. Paiement sur place, carte ou Square.</p>
+      <h3>Cueillette</h3>
+      <p>On vous confirme une date de cueillette par texto ou courriel. Vous passez chercher votre commande, déjà payée, au point de cueillette : 220, boulevard Wilfrid-Hamel, Québec (QC) G1L 5A7 <em>(adresse provisoire)</em>.</p>
     </div>
   </div>
 </section>
@@ -489,7 +489,7 @@
         <dt>Zone de vente</dt>
         <dd>Particuliers résidant au Québec.</dd>
         <dt>Paiement</dt>
-        <dd>Sur place à la cueillette (Square, carte ou virement).</dd>
+        <dd>En ligne, par carte, directement au moment de la commande.</dd>
         <dt>Contact</dt>
         <dd>Elisabeth : 418 261-0090 — Dimitri : 581 688-1228 — lakazmimoze@gmail.com</dd>
       </dl>
@@ -535,7 +535,7 @@
   </div>
   <div class="drawer-foot">
     <div class="totalrow"><span>Total</span><span id="cartTotal">0,00 $</span></div>
-    <button class="btn btn-primary btn-full" id="goCheckout" disabled>Réserver ma commande</button>
+    <button class="btn btn-primary btn-full" id="goCheckout" disabled>Commander et payer</button>
   </div>
 </div>
 
@@ -543,8 +543,8 @@
 <div class="modal-overlay" id="checkoutOverlay">
   <div class="modal" id="checkoutModal">
     <div id="checkoutForm">
-      <h2>Finaliser la réservation</h2>
-      <p class="sub">On vous recontacte pour confirmer la date de cueillette et le paiement.</p>
+      <h2>Finaliser la commande</h2>
+      <p class="sub">Le paiement se fait en ligne, maintenant. On vous recontacte ensuite pour confirmer la date de cueillette.</p>
       <div class="order-summary" id="orderSummary"></div>
       <div id="formMsg"></div>
       <div class="field">
@@ -568,8 +568,8 @@
     </div>
     <div id="confirmView" class="confirm-box hidden">
       <div class="checkmark">✓</div>
-      <h2>Réservation reçue</h2>
-      <p class="sub">Merci! On vous contacte bientôt pour confirmer.</p>
+      <h2>Commande reçue</h2>
+      <p class="sub">Merci! Votre paiement est confirmé. On vous contacte bientôt pour la cueillette.</p>
       <div class="order-id" id="confirmOrderId"></div>
       <button class="btn btn-primary btn-full" style="margin-top:20px;" id="closeConfirm">Fermer</button>
     </div>
@@ -858,8 +858,8 @@ document.getElementById('submitOrder').addEventListener('click', async ()=>{
   if(!saved){
     // 3) Dernier repli universel : courriel pré-rempli vers La Kaz Mimoze.
     const lines = order.items.map(i => `${i.qty} x ${i.name} — ${fmt(i.price*i.qty)}`).join('%0D%0A');
-    const body = `Nouvelle réservation (${order.id})%0D%0A%0D%0A${lines}%0D%0A%0D%0ATotal: ${fmt(order.total)}%0D%0A%0D%0ANom: ${order.name}%0D%0ATéléphone: ${order.phone}%0D%0ACourriel: ${order.email || '(non fourni)'}%0D%0ANote: ${order.note || '(aucune)'}`;
-    const subject = encodeURIComponent(`Réservation La Kaz Mimoze — ${order.id}`);
+    const body = `Nouvelle commande (${order.id})%0D%0A%0D%0A${lines}%0D%0A%0D%0ATotal: ${fmt(order.total)}%0D%0A%0D%0ANom: ${order.name}%0D%0ATéléphone: ${order.phone}%0D%0ACourriel: ${order.email || '(non fourni)'}%0D%0ANote: ${order.note || '(aucune)'}`;
+    const subject = encodeURIComponent(`Commande La Kaz Mimoze — ${order.id}`);
     window.location.href = `mailto:${BUSINESS_EMAIL}?subject=${subject}&body=${body}`;
   }
 
