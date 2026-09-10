@@ -194,7 +194,9 @@
     position:relative;
     transition:transform 0.18s ease, box-shadow 0.18s ease;
   }
-  .card:hover{transform:rotate(-0.5deg) translateY(-2px);box-shadow:0 8px 16px rgba(20,15,13,0.14);}
+  .card:nth-child(odd){transform:rotate(-0.6deg);}
+  .card:nth-child(even){transform:rotate(0.6deg);}
+  .card:hover{transform:rotate(0deg) translateY(-3px);box-shadow:0 8px 16px rgba(20,15,13,0.14);}
   .card::after{
     content:"";
     position:absolute;top:0;right:0;
@@ -211,8 +213,21 @@
     clip-path:polygon(0 0, 100% 0, 100% 65%, 91% 100%, 0 100%);
   }
   .card .icon{color:var(--teal);width:40px;height:40px;}
-  .card-photo{margin:-22px -20px 4px;border-radius:3px 3px 0 0;overflow:hidden;height:120px;}
+  .card-photo{position:relative;margin:-22px -20px 4px;border-radius:3px 3px 0 0;overflow:hidden;height:120px;}
   .card-photo img{width:100%;height:100%;object-fit:cover;display:block;}
+  .card-photo::after{
+    content:"";
+    position:absolute;left:0;right:0;bottom:-1px;height:14px;
+    background-image:radial-gradient(circle at 12px 14px, transparent 11px, var(--card) 11.5px);
+    background-repeat:repeat-x;background-size:24px 14px;
+  }
+  .card-icon{
+    position:absolute;right:8px;bottom:2px;z-index:2;
+    width:32px;height:32px;border-radius:50%;
+    background:var(--card);border:1.5px solid var(--line);
+    display:flex;align-items:center;justify-content:center;color:var(--sky);
+  }
+  .card-icon svg{width:18px;height:18px;}
   .card h3{font-size:1.15rem;margin-top:4px;}
   .card .contents{font-size:0.88rem;opacity:0.85;min-height:2.6em;margin:0;padding-left:18px;}
   .card .contents li{margin-bottom:3px;}
@@ -667,7 +682,7 @@ PRODUCTS.forEach(p=>{
   card.className = 'card';
   card.innerHTML = `
     ${p.badge ? `<span class="badge">${p.badge}</span>` : ''}
-    <div class="card-photo"><img src="${BOX_PHOTOS[p.id]}" alt="${p.name}"></div>
+    <div class="card-photo"><img src="${BOX_PHOTOS[p.id]}" alt="${p.name}"><span class="card-icon">${ICONS[p.icon]}</span></div>
     <h3>${p.name}</h3>
     <ul class="contents">${p.items.map(i=>`<li>${i}</li>`).join('')}</ul>
     ${p.note ? `<div class="note">${p.note}</div>` : ''}
