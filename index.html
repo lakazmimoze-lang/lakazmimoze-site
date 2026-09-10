@@ -186,7 +186,10 @@
     gap:22px;
   }
   .card{
-    background:var(--card);
+    background:
+      repeating-linear-gradient(120deg, rgba(74,58,40,0.05) 0px, rgba(74,58,40,0.05) 1px, transparent 1px, transparent 4px),
+      repeating-linear-gradient(30deg, rgba(74,58,40,0.035) 0px, rgba(74,58,40,0.035) 1px, transparent 1px, transparent 5px),
+      #F1E4C4;
     border:1.5px dashed var(--line);
     border-radius:3px;
     padding:22px 20px 20px;
@@ -215,16 +218,11 @@
   .card .icon{color:var(--teal);width:40px;height:40px;}
   .card-photo{position:relative;margin:-22px -20px 4px;border-radius:3px 3px 0 0;overflow:hidden;height:120px;}
   .card-photo img{width:100%;height:100%;object-fit:cover;display:block;}
-  .card-photo::after{
-    content:"";
-    position:absolute;left:0;right:0;bottom:-1px;height:14px;
-    background-image:radial-gradient(circle at 12px 14px, transparent 11px, var(--card) 11.5px);
-    background-repeat:repeat-x;background-size:24px 14px;
-  }
   .card-icon{
-    position:absolute;right:8px;bottom:2px;z-index:2;
+    position:absolute;right:8px;bottom:8px;z-index:2;
     width:32px;height:32px;border-radius:50%;
-    background:var(--card);border:1.5px solid var(--line);
+    background:var(--paper);border:1.5px solid var(--line);
+    box-shadow:0 2px 5px rgba(20,15,13,0.35);
     display:flex;align-items:center;justify-content:center;color:var(--sky);
   }
   .card-icon svg{width:18px;height:18px;}
