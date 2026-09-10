@@ -654,7 +654,7 @@ const fmt = n => n.toLocaleString('fr-CA',{minimumFractionDigits:2,maximumFracti
 // ---------- Catalogue à la pièce (sans prix pour l'instant) ----------
 const CATALOG = {
   'Sucré': ['Gâteau patate','Pâté créole','Bonbon miel','Bonbon coco','Macatia'],
-  'Apéro': ['Samoussas','Rillette porc (poulet)','Pâté de campagne','Pâté en croûte','Friand','Bonbon piment','Bouchon','Piment farci','Roulé au fromage','Roulé saucisse'],
+  'Apéro': [{n:'Samoussas (poulet ou porc)',p:0.75,u:'pièce'},'Rillette porc (poulet)','Pâté de campagne','Pâté en croûte','Friand','Bonbon piment','Bouchon','Piment farci','Roulé au fromage','Roulé saucisse'],
   'Condiments': ['Achards de légumes',{n:'Rub sec',p:6.99,u:'100g'},{n:'Marinade liquide',p:24.99},'Piment confit (piment la pâte) vert / rouge / cari'],
   'Charcuterie': [{n:'Saucisses sèches (différentes sortes)',p:22.99},{n:'Saucisses fumées',p:22.99},{n:'Boucané porc',p:29.99},{n:'Boucané poulet',p:29.99},{n:'Sarcives',p:29.99},{n:'Boudin (différentes sortes)',p:22.99},{n:'Saucisson sec',p:59.99}]
 };
