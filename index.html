@@ -266,6 +266,8 @@
   .catitem::before{content:"—";color:var(--oxblood);flex-shrink:0;}
   .catitem{justify-content:space-between;}
   .catprice{color:var(--oxblood);font-family:'Space Mono',monospace;font-weight:700;white-space:nowrap;flex-shrink:0;}
+  .catactions{display:flex;align-items:center;gap:8px;flex-shrink:0;}
+  .addbtn-sm{padding:4px 9px;font-size:0.72rem;}
 
   /* ---------- How it works ---------- */
   .steps{
@@ -457,7 +459,7 @@
     <div class="produits-content">
       <div class="section-head">
         <h2>Nos produits</h2>
-        <p>En plus des boîtes, une sélection de produits vendus à la pièce. Prix à venir — pas encore commandables en ligne.</p>
+        <p>En plus des boîtes, une sélection de produits vendus à la pièce, ajoutables directement à votre panier.</p>
       </div>
       <div id="catalogWrap"></div>
     </div>
@@ -656,6 +658,11 @@ const CATALOG = {
   'Condiments': [{n:'Achards de légumes',p:3.95,u:'pot (~200g)'},{n:'Rub sec',p:6.99,u:'100g'},{n:'Marinade liquide',p:24.99},{n:'Piment confit (piment la pâte) vert / rouge / cari',p:4.95,u:'pot (~200g)'}],
   'Charcuterie': [{n:'Saucisses sèches (différentes sortes)',p:22.99},{n:'Saucisses fumées',p:22.99},{n:'Boucané porc',p:29.99},{n:'Boucané poulet',p:29.99},{n:'Sarcives',p:29.99},{n:'Boudin (différentes sortes)',p:22.99},{n:'Saucisson sec',p:59.99}]
 };
+function slugify(s){
+  const stripped = s.normalize('NFD').split('').filter(ch => ch.charCodeAt(0) < 0x0300 || ch.charCodeAt(0) > 0x036f).join('');
+  return stripped.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'');
+}
+const CATALOG_ITEMS = [];
 const catalogWrap = document.getElementById('catalogWrap');
 Object.entries(CATALOG).forEach(([cat, items])=>{
   const group = document.createElement('div');
@@ -664,10 +671,18 @@ Object.entries(CATALOG).forEach(([cat, items])=>{
     const name = typeof i === 'string' ? i : i.n;
     const price = typeof i === 'string' ? null : i.p;
     const unit = (typeof i === 'object' && i.u) ? i.u : 'kg';
-    return `<div class="catitem"><span>${name}</span>${price ? `<span class="catprice">${fmt(price)}/${unit}</span>` : ''}</div>`;
+    if(!price){
+      return `<div class="catitem"><span>${name}</span></div>`;
+    }
+    const id = 'c-' + slugify(name);
+    CATALOG_ITEMS.push({id, name, price, unit});
+    return `<div class="catitem"><span>${name}</span><span class="catactions"><span class="catprice">${fmt(price)}/${unit}</span><button class="addbtn addbtn-sm" data-id="${id}">+ Ajouter</button></span></div>`;
   }).join('')}</div>`;
   catalogWrap.appendChild(group);
 });
+function findItem(id){
+  return PRODUCTS.find(x=>x.id===id) || CATALOG_ITEMS.find(x=>x.id===id);
+}
 
 // ---------- Render products ----------
 const grid = document.getElementById('productGrid');
@@ -704,7 +719,7 @@ function cartCountTotal(){
 }
 function cartPriceTotal(){
   return Object.entries(cart).reduce((sum,[id,qty])=>{
-    const p = PRODUCTS.find(x=>x.id===id);
+    const p = findItem(id);
     return sum + (p ? p.price*qty : 0);
   },0);
 }
@@ -720,7 +735,7 @@ function renderCart(){
     return;
   }
   body.innerHTML = entries.map(([id,qty])=>{
-    const p = PRODUCTS.find(x=>x.id===id);
+    const p = findItem(id);
     return `
       <div class="cartline">
         <div>
@@ -737,7 +752,7 @@ function renderCart(){
   }).join('');
 }
 
-grid.addEventListener('click', e=>{
+document.addEventListener('click', e=>{
   const btn = e.target.closest('.addbtn');
   if(!btn) return;
   const id = btn.dataset.id;
@@ -795,7 +810,7 @@ document.getElementById('goCheckout').addEventListener('click', ()=>{
   const entries = Object.entries(cart).filter(([,q])=>q>0);
   const summary = document.getElementById('orderSummary');
   summary.innerHTML = entries.map(([id,qty])=>{
-    const p = PRODUCTS.find(x=>x.id===id);
+    const p = findItem(id);
     return `<div class="osline"><span>${qty} × ${p.name}</span><span>${fmt(p.price*qty)}</span></div>`;
   }).join('') + `<div class="osline" style="font-weight:700;border-top:1px dashed var(--line);margin-top:6px;padding-top:6px;"><span>Total</span><span>${fmt(cartPriceTotal())}</span></div>`;
   document.getElementById('checkoutForm').classList.remove('hidden');
@@ -829,7 +844,7 @@ document.getElementById('submitOrder').addEventListener('click', async ()=>{
     id: 'BB-' + Date.now().toString(36).toUpperCase(),
     createdAt: new Date().toISOString(),
     items: entries.map(([id,qty])=>{
-      const p = PRODUCTS.find(x=>x.id===id);
+      const p = findItem(id);
       return {id, name:p.name, qty, price:p.price};
     }),
     total: cartPriceTotal(),
