@@ -314,10 +314,9 @@
   .footbottom{
     max-width:1080px;margin:26px auto 0;padding-top:18px;
     border-top:1px solid rgba(255,255,255,0.15);
-    display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;
+    display:flex;justify-content:center;gap:12px;flex-wrap:wrap;
     font-size:0.76rem;opacity:0.55;
   }
-  .footbottom button{background:none;border:none;color:inherit;opacity:1;cursor:pointer;font-size:0.76rem;text-decoration:underline;padding:0;font-family:inherit;}
 
   /* ---------- Cart drawer ---------- */
   .overlay{
@@ -357,7 +356,7 @@
   }
   .totalrow{display:flex;justify-content:space-between;font-weight:700;font-size:1.05rem;margin-bottom:14px;font-family:'Fraunces',serif;}
 
-  /* ---------- Modal (checkout / admin) ---------- */
+  /* ---------- Modal (checkout) ---------- */
   .modal-overlay{
     position:fixed;inset:0;background:rgba(20,15,13,0.55);
     display:none;align-items:center;justify-content:center;z-index:70;padding:20px;
@@ -388,10 +387,6 @@
   .order-id{font-family:'Space Mono',monospace;background:var(--card);border:1px dashed var(--line);
     padding:4px 10px;border-radius:2px;display:inline-block;margin-top:8px;font-size:0.85rem;}
 
-  .admin-order{
-    border:1px solid var(--line);border-radius:2px;padding:12px 14px;margin-bottom:10px;font-size:0.85rem;
-  }
-  .admin-order .aoid{font-family:'Space Mono',monospace;opacity:0.6;font-size:0.75rem;}
   .msg{font-size:0.85rem;padding:10px 12px;border-radius:2px;margin-bottom:12px;}
   .msg.err{background:#F5D9D9;color:#7C2430;}
   .msg.ok{background:#E1E8D9;color:#3E4A32;}
@@ -535,7 +530,6 @@
   </div>
   <div class="footbottom">
     <span>© 2026 La Kaz Mimoze</span>
-    <button id="adminLink">Espace boucherie</button>
   </div>
 </footer>
 
@@ -588,29 +582,6 @@
       <p class="sub">Merci! Votre paiement est confirmé. On vous contacte bientôt pour la cueillette.</p>
       <div class="order-id" id="confirmOrderId"></div>
       <button class="btn btn-primary btn-full" style="margin-top:20px;" id="closeConfirm">Fermer</button>
-    </div>
-  </div>
-</div>
-
-<!-- Admin modal -->
-<div class="modal-overlay" id="adminOverlay">
-  <div class="modal">
-    <div id="adminGate">
-      <h2>Espace Kaz Mimoze</h2>
-      <p class="sub">Réservé à Zabeth et Dimitri.</p>
-      <div class="field">
-        <label for="adminPass">Code d'accès</label>
-        <input type="password" id="adminPass">
-      </div>
-      <div id="adminMsg"></div>
-      <button class="btn btn-primary btn-full" id="adminSubmit">Entrer</button>
-      <button class="btn btn-ghost btn-full" style="margin-top:10px;" id="adminCancel">Fermer</button>
-    </div>
-    <div id="adminOrders" class="hidden">
-      <h2>Commandes reçues</h2>
-      <p class="sub" id="adminStatus">Chargement…</p>
-      <div id="adminList"></div>
-      <button class="btn btn-ghost btn-full" style="margin-top:14px;" id="adminClose2">Fermer</button>
     </div>
   </div>
 </div>
@@ -823,11 +794,7 @@ document.getElementById('goCheckout').addEventListener('click', ()=>{
 document.getElementById('cancelCheckout').addEventListener('click', ()=> checkoutOverlay.classList.remove('open'));
 checkoutOverlay.addEventListener('click', e=>{ if(e.target===checkoutOverlay) checkoutOverlay.classList.remove('open'); });
 
-let db = null;
 const BUSINESS_EMAIL = 'lakazmimoze@gmail.com';
-(async ()=>{
-  try{ db = await claude.use('db'); }catch(e){ db = null; }
-})();
 
 document.getElementById('submitOrder').addEventListener('click', async ()=>{
   const name = document.getElementById('custName').value.trim();
@@ -877,25 +844,14 @@ document.getElementById('submitOrder').addEventListener('click', async ()=>{
     }
   }catch(e){ /* fonction indisponible — on tente les autres options ci-dessous */ }
 
-  // 2) Repli pour tester sur claude.ai (avant déploiement Netlify) : enregistrement direct.
-  let saved = false;
-  try{
-    if(db){
-      await db.doc('orders/' + order.id).set(order);
-      saved = true;
-    }
-  }catch(e){ saved = false; }
-
+  // 2) Repli universel si Stripe est indisponible : courriel pré-rempli vers La Kaz Mimoze.
   submitBtn.disabled = false;
   submitBtn.textContent = 'Payer et confirmer';
 
-  if(!saved){
-    // 3) Dernier repli universel : courriel pré-rempli vers La Kaz Mimoze.
-    const lines = order.items.map(i => `${i.qty} x ${i.name} — ${fmt(i.price*i.qty)}`).join('%0D%0A');
-    const body = `Nouvelle commande (${order.id})%0D%0A%0D%0A${lines}%0D%0A%0D%0ATotal: ${fmt(order.total)}%0D%0A%0D%0ANom: ${order.name}%0D%0ATéléphone: ${order.phone}%0D%0ACourriel: ${order.email || '(non fourni)'}%0D%0ANote: ${order.note || '(aucune)'}`;
-    const subject = encodeURIComponent(`Commande La Kaz Mimoze — ${order.id}`);
-    window.location.href = `mailto:${BUSINESS_EMAIL}?subject=${subject}&body=${body}`;
-  }
+  const lines = order.items.map(i => `${i.qty} x ${i.name} — ${fmt(i.price*i.qty)}`).join('%0D%0A');
+  const body = `Nouvelle commande (${order.id})%0D%0A%0D%0A${lines}%0D%0A%0D%0ATotal: ${fmt(order.total)}%0D%0A%0D%0ANom: ${order.name}%0D%0ATéléphone: ${order.phone}%0D%0ACourriel: ${order.email || '(non fourni)'}%0D%0ANote: ${order.note || '(aucune)'}`;
+  const subject = encodeURIComponent(`Commande La Kaz Mimoze — ${order.id}`);
+  window.location.href = `mailto:${BUSINESS_EMAIL}?subject=${subject}&body=${body}`;
 
   cart = {};
   saveCart(); renderCart();
@@ -905,61 +861,6 @@ document.getElementById('submitOrder').addEventListener('click', async ()=>{
 });
 
 document.getElementById('closeConfirm').addEventListener('click', ()=> checkoutOverlay.classList.remove('open'));
-
-// ---------- Admin ----------
-const ADMIN_CODE = 'mimoze2026';
-const adminOverlay = document.getElementById('adminOverlay');
-document.getElementById('adminLink').addEventListener('click', ()=>{
-  document.getElementById('adminGate').classList.remove('hidden');
-  document.getElementById('adminOrders').classList.add('hidden');
-  document.getElementById('adminMsg').innerHTML = '';
-  document.getElementById('adminPass').value = '';
-  adminOverlay.classList.add('open');
-});
-document.getElementById('adminCancel').addEventListener('click', ()=> adminOverlay.classList.remove('open'));
-document.getElementById('adminClose2').addEventListener('click', ()=> adminOverlay.classList.remove('open'));
-adminOverlay.addEventListener('click', e=>{ if(e.target===adminOverlay) adminOverlay.classList.remove('open'); });
-
-document.getElementById('adminSubmit').addEventListener('click', async ()=>{
-  const val = document.getElementById('adminPass').value;
-  if(val !== ADMIN_CODE){
-    document.getElementById('adminMsg').innerHTML = '<div class="msg err">Code incorrect.</div>';
-    return;
-  }
-  document.getElementById('adminGate').classList.add('hidden');
-  document.getElementById('adminOrders').classList.remove('hidden');
-  const list = document.getElementById('adminList');
-  const status = document.getElementById('adminStatus');
-  list.innerHTML = '';
-  if(!db){
-    status.textContent = "Impossible de charger les commandes pour l'instant.";
-    return;
-  }
-  try{
-    const res = await db.collection('orders').orderBy('createdAt','desc').get();
-    const docs = res.docs || res || [];
-    if(!docs.length){
-      status.textContent = 'Aucune commande pour le moment.';
-      return;
-    }
-    status.textContent = docs.length + ' commande(s)';
-    list.innerHTML = docs.map(d=>{
-      const o = d.data ? d.data() : d;
-      const items = (o.items||[]).map(i=> `${i.qty}× ${i.name}`).join(', ');
-      return `
-        <div class="admin-order">
-          <div class="aoid">${o.id} — ${new Date(o.createdAt).toLocaleString('fr-CA')}</div>
-          <div><strong>${o.name}</strong> — ${o.phone}${o.email ? ' — '+o.email : ''}</div>
-          <div style="margin-top:4px;">${items}</div>
-          <div style="margin-top:4px;font-weight:700;">${fmt(o.total)}</div>
-          ${o.note ? `<div style="margin-top:4px;font-style:italic;opacity:0.8;">${o.note}</div>` : ''}
-        </div>
-      `;
-    }).join('');
-  }catch(e){
-    status.textContent = "Erreur lors du chargement des commandes.";
-  }
-});
 </script>
 </body>
 </html>
