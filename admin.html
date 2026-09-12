@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Commandes — La Kaz Mimoze</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;900&family=Archivo:wght@400;600;700&family=Space+Mono:wght@700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --cream:#F3E7D2;--paper:#FBF2E1;--oxblood:#C1432E;--oxblood-dark:#93301F;
+    --charcoal:#2A2118;--mustard:#EFAE2E;--teal:#2F6B72;--sage:#4B6B4F;
+    --line:#D8C39C;--card:#FFFBF1;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;background:var(--cream);color:var(--charcoal);
+    font-family:'Archivo',sans-serif;line-height:1.5;
+  }
+  .wrap{max-width:900px;margin:0 auto;padding:32px 20px 60px;}
+  h1{font-family:'Fraunces',serif;font-weight:900;font-size:1.6rem;margin:0 0 6px;}
+  .sub{opacity:0.7;font-size:0.9rem;margin:0 0 28px;}
+
+  #gate{
+    max-width:360px;margin:60px auto;background:var(--card);
+    border:1px solid var(--line);border-radius:16px;padding:28px 26px;text-align:center;
+  }
+  #gate h1{font-size:1.3rem;}
+  #gate input{
+    width:100%;padding:11px 12px;border:1.5px solid var(--line);border-radius:10px;
+    background:#fff;color:var(--charcoal);font-size:0.95rem;margin:16px 0;font-family:inherit;
+  }
+  #gate button, .refresh-btn{
+    width:100%;padding:11px 16px;border:none;border-radius:10px;
+    background:var(--oxblood);color:#fff;font-weight:700;font-size:0.95rem;
+    cursor:pointer;font-family:inherit;
+  }
+  #gate button:hover, .refresh-btn:hover{background:var(--oxblood-dark);}
+  #gateErr{color:var(--oxblood-dark);font-size:0.85rem;min-height:1.2em;margin-top:4px;}
+
+  .topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px;}
+  .refresh-btn{width:auto;padding:9px 16px;font-size:0.85rem;}
+  .status-pill{font-size:0.78rem;opacity:0.6;}
+
+  .order{
+    background:var(--card);border:1px solid var(--line);border-radius:16px;
+    padding:18px 20px;margin-bottom:14px;
+  }
+  .order-top{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap;}
+  .order-id{font-family:'Space Mono',monospace;font-size:0.72rem;opacity:0.55;}
+  .order-date{font-size:0.78rem;opacity:0.6;}
+  .order-name{font-family:'Fraunces',serif;font-weight:700;font-size:1.1rem;margin-top:4px;}
+  .order-contact{font-size:0.86rem;opacity:0.8;margin-top:2px;}
+  .order-items{margin:10px 0;font-size:0.88rem;}
+  .order-items div{padding:2px 0;}
+  .order-note{font-size:0.85rem;font-style:italic;opacity:0.75;margin:6px 0;}
+  .order-total{font-family:'Fraunces',serif;font-weight:900;font-size:1.15rem;color:var(--oxblood);margin-top:8px;}
+  .order-foot{display:flex;justify-content:space-between;align-items:center;margin-top:12px;flex-wrap:wrap;gap:10px;}
+
+  .status-select{
+    padding:7px 10px;border-radius:8px;border:1.5px solid var(--line);
+    font-family:inherit;font-size:0.85rem;background:#fff;color:var(--charcoal);
+  }
+  .status-badge{
+    font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.03em;
+    padding:4px 10px;border-radius:999px;color:#fff;
+  }
+  .status-nouvelle{background:var(--oxblood);}
+  .status-préparée{background:var(--mustard);color:var(--charcoal);}
+  .status-remise{background:var(--sage);}
+
+  .empty{text-align:center;padding:60px 20px;opacity:0.6;}
+  .hidden{display:none !important;}
+</style>
+</head>
+<body>
+
+<div id="gate">
+  <h1>Espace Kaz Mimoze</h1>
+  <p class="sub">Réservé à Zabet et Dimitri.</p>
+  <input type="password" id="pass" placeholder="Mot de passe">
+  <button id="gateSubmit">Entrer</button>
+  <div id="gateErr"></div>
+</div>
+
+<div id="app" class="wrap hidden">
+  <div class="topbar">
+    <div>
+      <h1>Commandes</h1>
+      <p class="sub" style="margin:0;">Mise à jour automatique toutes les 20 secondes.</p>
+    </div>
+    <div style="text-align:right;">
+      <button class="refresh-btn" id="refreshBtn">Rafraîchir</button>
+      <div class="status-pill" id="lastUpdate"></div>
+    </div>
+  </div>
+  <div id="list"></div>
+</div>
+
+<script>
+const pass = sessionStorage.getItem('kazmimoze_admin_pass') || '';
+let currentPass = pass;
+
+function fmt(n){ return n.toLocaleString('fr-CA', {style:'currency', currency:'CAD'}); }
+
+async function fetchOrders(){
+  const res = await fetch('/.netlify/functions/admin-orders', {
+    headers: { 'x-admin-password': currentPass }
+  });
+  if(res.status === 401){ return null; }
+  const data = await res.json();
+  return data.orders || [];
+}
+
+function renderOrders(orders){
+  const list = document.getElementById('list');
+  if(!orders.length){
+    list.innerHTML = '<div class="empty">Aucune commande pour le moment.</div>';
+    return;
+  }
+  list.innerHTML = orders.map(o => {
+    const date = new Date(o.createdAt).toLocaleString('fr-CA', {dateStyle:'medium', timeStyle:'short'});
+    const items = (o.items||[]).map(i => `<div>${i.qty}× ${i.name} — ${fmt(i.price*i.qty)}</div>`).join('');
+    const status = o.status || 'nouvelle';
+    return `
+      <div class="order" data-id="${o.id}">
+        <div class="order-top">
+          <div>
+            <div class="order-name">${o.name || '(sans nom)'}</div>
+            <div class="order-contact">${o.phone || ''}${o.email ? ' — '+o.email : ''}</div>
+          </div>
+          <div style="text-align:right;">
+            <div class="order-date">${date}</div>
+            <div class="order-id">${o.id}</div>
+          </div>
+        </div>
+        <div class="order-items">${items}</div>
+        ${o.note ? `<div class="order-note">${o.note}</div>` : ''}
+        <div class="order-foot">
+          <div class="order-total">${fmt(o.total)}</div>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <span class="status-badge status-${status}">${status}</span>
+            <select class="status-select" data-id="${o.id}">
+              <option value="nouvelle" ${status==='nouvelle'?'selected':''}>Nouvelle</option>
+              <option value="préparée" ${status==='préparée'?'selected':''}>Préparée</option>
+              <option value="remise" ${status==='remise'?'selected':''}>Remise</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  list.querySelectorAll('.status-select').forEach(sel => {
+    sel.addEventListener('change', async (e) => {
+      const id = e.target.dataset.id;
+      const status = e.target.value;
+      await fetch('/.netlify/functions/admin-update-order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-admin-password': currentPass },
+        body: JSON.stringify({ id, status })
+      });
+      refresh();
+    });
+  });
+}
+
+async function refresh(){
+  const orders = await fetchOrders();
+  if(orders === null){
+    document.getElementById('app').classList.add('hidden');
+    document.getElementById('gate').classList.remove('hidden');
+    document.getElementById('gateErr').textContent = 'Session expirée, entrez le mot de passe à nouveau.';
+    sessionStorage.removeItem('kazmimoze_admin_pass');
+    return;
+  }
+  renderOrders(orders);
+  document.getElementById('lastUpdate').textContent = 'Dernière mise à jour : ' + new Date().toLocaleTimeString('fr-CA');
+}
+
+document.getElementById('gateSubmit').addEventListener('click', async () => {
+  currentPass = document.getElementById('pass').value;
+  const orders = await fetchOrders();
+  if(orders === null){
+    document.getElementById('gateErr').textContent = 'Mot de passe incorrect.';
+    return;
+  }
+  sessionStorage.setItem('kazmimoze_admin_pass', currentPass);
+  document.getElementById('gate').classList.add('hidden');
+  document.getElementById('app').classList.remove('hidden');
+  renderOrders(orders);
+  document.getElementById('lastUpdate').textContent = 'Dernière mise à jour : ' + new Date().toLocaleTimeString('fr-CA');
+});
+document.getElementById('pass').addEventListener('keydown', (e) => {
+  if(e.key === 'Enter') document.getElementById('gateSubmit').click();
+});
+document.getElementById('refreshBtn').addEventListener('click', refresh);
+
+if(pass){
+  fetchOrders().then(orders => {
+    if(orders === null) return;
+    document.getElementById('gate').classList.add('hidden');
+    document.getElementById('app').classList.remove('hidden');
+    renderOrders(orders);
+    document.getElementById('lastUpdate').textContent = 'Dernière mise à jour : ' + new Date().toLocaleTimeString('fr-CA');
+  });
+}
+
+setInterval(() => {
+  if(!document.getElementById('app').classList.contains('hidden')) refresh();
+}, 20000);
+</script>
+</body>
+</html>
