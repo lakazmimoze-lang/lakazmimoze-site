@@ -2,7 +2,7 @@
 // Protégé par un mot de passe (ADMIN_PASSWORD, configuré dans Netlify —
 // Site settings → Environment variables — jamais écrit dans le code).
 
-const { getStore } = require('@netlify/blobs');
+const { ordersStore } = require('./lib/orders-store');
 
 exports.handler = async (event) => {
   const adminPassword = process.env.ADMIN_PASSWORD;
@@ -12,7 +12,7 @@ exports.handler = async (event) => {
     return { statusCode: 401, body: JSON.stringify({ error: 'Non autorisé.' }) };
   }
 
-  const store = getStore('orders');
+  const store = ordersStore();
   const { blobs } = await store.list();
   const orders = await Promise.all(blobs.map((b) => store.get(b.key, { type: 'json' })));
   orders.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));

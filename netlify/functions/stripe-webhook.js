@@ -7,7 +7,7 @@
 // Environment variables). Sert à vérifier que l'appel vient bien de Stripe.
 
 const Stripe = require('stripe');
-const { getStore } = require('@netlify/blobs');
+const { ordersStore } = require('./lib/orders-store');
 
 exports.handler = async (event) => {
   if (event.httpMethod !== 'POST') {
@@ -54,7 +54,7 @@ exports.handler = async (event) => {
       status: 'nouvelle',
     };
 
-    const store = getStore('orders');
+    const store = ordersStore();
     await store.setJSON(order.id, order);
   }
 

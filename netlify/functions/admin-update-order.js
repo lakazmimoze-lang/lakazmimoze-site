@@ -1,7 +1,7 @@
 // Met à jour le statut d'une commande (nouvelle / préparée / remise),
 // depuis la page admin.html. Même protection par mot de passe qu'admin-orders.
 
-const { getStore } = require('@netlify/blobs');
+const { ordersStore } = require('./lib/orders-store');
 
 exports.handler = async (event) => {
   if (event.httpMethod !== 'POST') {
@@ -19,7 +19,7 @@ exports.handler = async (event) => {
     return { statusCode: 400, body: JSON.stringify({ error: 'Requête invalide.' }) };
   }
 
-  const store = getStore('orders');
+  const store = ordersStore();
   const order = await store.get(id, { type: 'json' });
   if (!order) {
     return { statusCode: 404, body: JSON.stringify({ error: 'Commande introuvable.' }) };
