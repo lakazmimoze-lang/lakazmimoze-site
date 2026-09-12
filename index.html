@@ -131,6 +131,31 @@
   nav a:hover{color:var(--oxblood);}
   .navlinks{display:flex;gap:22px;}
   @media (max-width:640px){ .navlinks{display:none;} }
+  .nav-right{display:flex;align-items:center;gap:10px;}
+
+  .hamburger{
+    display:none;background:none;border:none;cursor:pointer;padding:6px;color:var(--charcoal);
+  }
+  .hamburger svg{width:26px;height:26px;display:block;}
+  @media (max-width:640px){ .hamburger{display:inline-flex;} }
+
+  .mobile-nav{
+    display:none;position:fixed;inset:0;background:rgba(20,15,13,0.55);z-index:90;
+  }
+  .mobile-nav.open{display:block;}
+  .mobile-nav-panel{
+    position:relative;background:var(--paper);height:100%;max-width:300px;margin-left:auto;
+    padding:70px 26px 24px;display:flex;flex-direction:column;
+    box-shadow:-6px 0 20px rgba(20,15,13,0.25);
+  }
+  .mobile-nav-panel a{
+    padding:15px 4px;border-bottom:1px solid var(--line);
+    text-decoration:none;color:var(--charcoal);font-weight:700;font-size:1.05rem;
+  }
+  .mobile-nav-close{
+    position:absolute;top:16px;right:18px;background:none;border:none;
+    font-size:2rem;line-height:1;cursor:pointer;color:var(--charcoal);padding:4px 8px;
+  }
 
   .cartbtn{
     position:relative;
@@ -420,13 +445,28 @@
         <a href="#comment">Cueillette</a>
         <a href="#apropos">À propos</a>
       </div>
-      <button class="cartbtn" id="openCart">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="19" height="19"><circle cx="9" cy="20" r="1.4" fill="currentColor" stroke="none"/><circle cx="18" cy="20" r="1.4" fill="currentColor" stroke="none"/><path d="M2.5 3h2.4l1.2 3M6.1 6l1.9 8.4a1.8 1.8 0 0 0 1.75 1.4h7.1a1.8 1.8 0 0 0 1.75-1.38L20.5 8H6.1Z"/></svg>
-        Panier <span class="cartcount" id="cartCount">0</span>
-      </button>
+      <div class="nav-right">
+        <button class="cartbtn" id="openCart">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="19" height="19"><circle cx="9" cy="20" r="1.4" fill="currentColor" stroke="none"/><circle cx="18" cy="20" r="1.4" fill="currentColor" stroke="none"/><path d="M2.5 3h2.4l1.2 3M6.1 6l1.9 8.4a1.8 1.8 0 0 0 1.75 1.4h7.1a1.8 1.8 0 0 0 1.75-1.38L20.5 8H6.1Z"/></svg>
+          Panier <span class="cartcount" id="cartCount">0</span>
+        </button>
+        <button class="hamburger" id="openMobileNav" aria-label="Menu">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+      </div>
     </nav>
   </div>
 </header>
+
+<div class="mobile-nav" id="mobileNav">
+  <div class="mobile-nav-panel">
+    <button class="mobile-nav-close" id="closeMobileNav" aria-label="Fermer">&times;</button>
+    <a href="#boites">Nos boîtes</a>
+    <a href="#produits">Produits</a>
+    <a href="#comment">Cueillette</a>
+    <a href="#apropos">À propos</a>
+  </div>
+</div>
 
 <div class="hero">
   <div>
@@ -763,6 +803,13 @@ function closeDrawer(){
 document.getElementById('openCart').addEventListener('click', openDrawer);
 document.getElementById('closeCart').addEventListener('click', closeDrawer);
 document.getElementById('overlay').addEventListener('click', closeDrawer);
+
+// ---------- Menu mobile ----------
+const mobileNav = document.getElementById('mobileNav');
+document.getElementById('openMobileNav').addEventListener('click', ()=> mobileNav.classList.add('open'));
+document.getElementById('closeMobileNav').addEventListener('click', ()=> mobileNav.classList.remove('open'));
+mobileNav.addEventListener('click', e=>{ if(e.target===mobileNav) mobileNav.classList.remove('open'); });
+mobileNav.querySelectorAll('a').forEach(a=> a.addEventListener('click', ()=> mobileNav.classList.remove('open')));
 
 renderCart();
 
