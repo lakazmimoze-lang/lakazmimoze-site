@@ -481,7 +481,7 @@
     <div class="step">
       <div class="num">3</div>
       <h3>Cueillette</h3>
-      <p>On vous confirme une date de cueillette par texto ou courriel. Vous passez chercher votre commande, déjà payée, au point de cueillette : 220, boulevard Wilfrid-Hamel, Québec (QC) G1L 5A7 <em>(adresse provisoire)</em>.</p>
+      <p>Comptez un délai d'environ 7 jours pour la préparation. On vous confirme une date de cueillette par texto ou courriel. Vous passez chercher votre commande, déjà payée, au point de cueillette : 220, boulevard Wilfrid-Hamel, Québec (QC) G1L 5A7 <em>(adresse provisoire)</em>.</p>
     </div>
   </div>
 </section>
@@ -554,7 +554,7 @@
   <div class="modal" id="checkoutModal">
     <div id="checkoutForm">
       <h2>Finaliser la commande</h2>
-      <p class="sub">Le paiement se fait en ligne, maintenant. On vous recontacte ensuite pour confirmer la date de cueillette.</p>
+      <p class="sub">Le paiement se fait en ligne, maintenant. Prévoyez un délai d'environ 7 jours avant la cueillette — on vous recontacte pour confirmer la date exacte.</p>
       <div class="order-summary" id="orderSummary"></div>
       <div id="formMsg"></div>
       <div class="field">
@@ -579,7 +579,7 @@
     <div id="confirmView" class="confirm-box hidden">
       <div class="checkmark">✓</div>
       <h2>Commande reçue</h2>
-      <p class="sub">Merci! Votre paiement est confirmé. On vous contacte bientôt pour la cueillette.</p>
+      <p class="sub">Merci! Votre paiement est confirmé. Comptez environ 7 jours de délai — on vous contacte bientôt pour confirmer la date de cueillette.</p>
       <div class="order-id" id="confirmOrderId"></div>
       <button class="btn btn-primary btn-full" style="margin-top:20px;" id="closeConfirm">Fermer</button>
     </div>
@@ -624,10 +624,10 @@ const fmt = n => n.toLocaleString('fr-CA',{minimumFractionDigits:2,maximumFracti
 
 // ---------- Catalogue à la pièce (sans prix pour l'instant) ----------
 const CATALOG = {
-  'Sucré': [{n:'Gâteau patate',p:2.20,u:'part'},{n:'Pâté créole',p:3.00,u:'part'},{n:'Bonbon miel',p:4.50,u:'sachet de 4'},{n:'Bonbon coco',p:1.50,u:'pièce'},{n:'Macatia',p:1.50,u:'pièce'}],
-  'Apéro': [{n:'Samoussas (poulet ou porc)',p:0.75,u:'pièce'},{n:'Rillette de porc',p:4.00,u:'pot (~200g)'},{n:'Rillette de poulet',p:4.60,u:'pot (~200g)'},{n:'Pâté de campagne',p:4.00,u:'pot (~200g)'},{n:'Pâté en croûte',p:6.40,u:'pot (~200g)'},{n:'Friand',p:2.00,u:'pièce'},{n:'Bonbon piment',p:0.60,u:'pièce'},{n:'Bouchon',p:0.65,u:'pièce'},{n:'Piment farci',p:1.60,u:'pièce'},{n:'Roulé au fromage',p:1.90,u:'pièce'},{n:'Roulé saucisse',p:1.80,u:'pièce'}],
+  'Sucré': [{n:'Gâteau patate',p:2.20,u:'part',active:false},{n:'Pâté créole',p:3.00,u:'part',active:false},{n:'Bonbon miel',p:4.50,u:'sachet de 4',active:false},{n:'Bonbon coco',p:1.50,u:'pièce',active:false},{n:'Macatia',p:1.50,u:'pièce',active:false}],
+  'Apéro': [{n:'Samoussas (poulet ou porc)',p:0.75,u:'pièce',active:false},{n:'Rillette de porc',p:4.00,u:'pot (~200g)'},{n:'Rillette de poulet',p:4.60,u:'pot (~200g)'},{n:'Pâté de campagne',p:4.00,u:'pot (~200g)'},{n:'Pâté en croûte',p:6.40,u:'pot (~200g)',active:false},{n:'Friand',p:2.00,u:'pièce'},{n:'Bonbon piment',p:0.60,u:'pièce'},{n:'Bouchon',p:0.65,u:'pièce'},{n:'Piment farci',p:1.60,u:'pièce',active:false},{n:'Roulé au fromage',p:1.90,u:'pièce'},{n:'Roulé saucisse',p:1.80,u:'pièce'}],
   'Condiments': [{n:'Achards de légumes',p:3.95,u:'pot (~200g)'},{n:'Rub sec',p:6.99,u:'100g'},{n:'Marinade liquide',p:24.99},{n:'Piment confit (piment la pâte) vert / rouge / cari',p:4.95,u:'pot (~200g)'}],
-  'Charcuterie': [{n:'Saucisses sèches (différentes sortes)',p:22.99},{n:'Saucisses fumées',p:22.99},{n:'Boucané porc',p:29.99},{n:'Boucané poulet',p:29.99},{n:'Sarcives',p:29.99},{n:'Boudin (différentes sortes)',p:22.99},{n:'Saucisson sec',p:59.99}]
+  'Charcuterie': [{n:'Saucisses sèches (différentes sortes)',p:22.99},{n:'Saucisses fumées',p:22.99},{n:'Boucané porc',p:29.99},{n:'Boucané poulet',p:29.99},{n:'Sarcives',p:29.99},{n:'Boudin (différentes sortes)',p:22.99},{n:'Saucisson sec',p:59.99,active:false}]
 };
 function slugify(s){
   const stripped = s.normalize('NFD').split('').filter(ch => ch.charCodeAt(0) < 0x0300 || ch.charCodeAt(0) > 0x036f).join('');
