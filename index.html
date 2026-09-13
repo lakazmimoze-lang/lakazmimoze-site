@@ -284,6 +284,7 @@
   @media (max-width:800px){ .produits-layout{grid-template-columns:1fr;} }
   .produits-photo{display:flex;flex-direction:column;gap:20px;position:sticky;top:90px;}
   .produits-photo img{width:100%;height:auto;border-radius:6px;display:block;}
+  @media (max-width:800px){ .produits-photo{position:static;} }
   .produits-content .section-head{margin:0 0 28px;padding:0;max-width:none;}
 
   /* ---------- Catalogue (produits à la pièce) ---------- */
@@ -295,13 +296,18 @@
   .catlist{column-count:2;column-gap:28px;}
   @media (max-width:520px){ .catlist{column-count:1;} }
   .catitem{
-    display:flex;align-items:center;gap:8px;
-    padding:7px 0;border-bottom:1px dotted var(--line);
+    display:flex;align-items:center;gap:10px;
+    padding:10px 0;border-bottom:1px dotted var(--line);
     font-size:0.92rem;break-inside:avoid;
   }
   .catitem::before{content:"—";color:var(--oxblood);flex-shrink:0;}
   .catitem{justify-content:space-between;}
-  .catitem-img{width:40px;height:40px;border-radius:8px;object-fit:cover;flex-shrink:0;}
+  .catitem-img{width:64px;height:64px;border-radius:10px;object-fit:cover;flex-shrink:0;}
+  .catname{flex:1;min-width:0;}
+  @media (max-width:520px){
+    .catitem{flex-wrap:wrap;}
+    .catactions{width:100%;justify-content:space-between;}
+  }
   .catprice{color:var(--oxblood);font-family:'Space Mono',monospace;font-weight:700;white-space:nowrap;flex-shrink:0;}
   .catactions{display:flex;align-items:center;gap:8px;flex-shrink:0;}
   .addbtn-sm{padding:4px 9px;font-size:0.72rem;}
@@ -716,11 +722,11 @@ Object.entries(CATALOG).forEach(([cat, items])=>{
     const unit = (typeof i === 'object' && i.u) ? i.u : 'kg';
     const photo = ITEM_IMAGES[name] ? `<img class="catitem-img" src="${ITEM_IMAGES[name]}" alt="">` : '';
     if(!price){
-      return `<div class="catitem">${photo}<span>${name}</span></div>`;
+      return `<div class="catitem">${photo}<span class="catname">${name}</span></div>`;
     }
     const id = 'c-' + slugify(name);
     CATALOG_ITEMS.push({id, name, price, unit});
-    return `<div class="catitem">${photo}<span>${name}</span><span class="catactions"><span class="catprice">${fmt(price)}/${unit}</span><button class="addbtn addbtn-sm" data-id="${id}">+ Ajouter</button></span></div>`;
+    return `<div class="catitem">${photo}<span class="catname">${name}</span><span class="catactions"><span class="catprice">${fmt(price)}/${unit}</span><button class="addbtn addbtn-sm" data-id="${id}">+ Ajouter</button></span></div>`;
   }).join('')}</div>`;
   catalogWrap.appendChild(group);
 });
