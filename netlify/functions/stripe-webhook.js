@@ -8,6 +8,7 @@
 
 const Stripe = require('stripe');
 const { ordersStore } = require('./lib/orders-store');
+const { sendOrderConfirmationEmail } = require('./lib/send-order-email');
 
 exports.handler = async (event) => {
   if (event.httpMethod !== 'POST') {
@@ -56,6 +57,12 @@ exports.handler = async (event) => {
 
     const store = ordersStore();
     await store.setJSON(order.id, order);
+
+    try {
+      await sendOrderConfirmationEmail(order);
+    } catch (err) {
+      console.error('Erreur envoi courriel de confirmation:', err);
+    }
   }
 
   return { statusCode: 200, body: 'ok' };
