@@ -312,9 +312,16 @@
   }
   @media (max-width:760px){ .steps{grid-template-columns:1fr;} }
   .step{padding-right:10px;}
+  .step-icon{
+    width:52px;height:52px;border-radius:50%;
+    background:var(--card);border:1.5px solid var(--line);
+    display:flex;align-items:center;justify-content:center;
+    color:var(--teal);margin-bottom:14px;
+  }
+  .step-icon svg{width:26px;height:26px;}
   .step .num{
     font-family:'Space Mono',monospace;font-weight:700;color:var(--teal);
-    font-size:2rem;line-height:1;margin-bottom:8px;
+    font-size:1.3rem;line-height:1;margin-bottom:6px;
   }
   .step h3{font-size:1.05rem;margin-bottom:6px;}
   .step p{font-size:0.92rem;opacity:0.85;margin:0;}
@@ -520,16 +527,19 @@
   </div>
   <div class="steps">
     <div class="step">
+      <div class="step-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4a2 2 0 0 0 1-1.73Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg></div>
       <div class="num">1</div>
       <h3>Choisissez vos boîtes</h3>
       <p>Ajoutez une ou plusieurs boîtes au panier selon vos besoins.</p>
     </div>
     <div class="step">
+      <div class="step-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg></div>
       <div class="num">2</div>
       <h3>Payez en ligne</h3>
       <p>Laissez vos coordonnées et payez directement sur le site, par carte. Vous recevez une confirmation immédiate.</p>
     </div>
     <div class="step">
+      <div class="step-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg></div>
       <div class="num">3</div>
       <h3>Cueillette</h3>
       <p>Comptez un délai d'environ 7 jours — rien n'est fait à l'avance, tout est préparé frais à la commande. On vous confirme une date de cueillette par texto ou courriel. Vous passez chercher votre commande, déjà payée, au point de cueillette : 220, boulevard Wilfrid-Hamel, Québec (QC) G1L 5A7 <em>(à confirmer)</em>.</p>
