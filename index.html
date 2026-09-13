@@ -301,6 +301,7 @@
     font-size:0.92rem;break-inside:avoid;
   }
   .catitem::before{content:"—";color:var(--oxblood);flex-shrink:0;}
+  .catitem.has-photo::before{content:none;}
   .catitem{justify-content:space-between;}
   .catitem-img{width:88px;height:88px;border-radius:10px;object-fit:cover;flex-shrink:0;cursor:pointer;}
   .catname{flex:1;min-width:0;}
@@ -749,13 +750,15 @@ Object.entries(CATALOG).forEach(([cat, items])=>{
     const price = typeof i === 'string' ? null : i.p;
     const unit = (typeof i === 'object' && i.u) ? i.u : 'kg';
     const fullSrc = ITEM_IMAGES_FULL[name] || ITEM_IMAGES[name];
-    const photo = ITEM_IMAGES[name] ? `<img class="catitem-img" src="${ITEM_IMAGES[name]}" alt="" data-full="${fullSrc}">` : '';
+    const hasPhoto = !!ITEM_IMAGES[name];
+    const photo = hasPhoto ? `<img class="catitem-img" src="${ITEM_IMAGES[name]}" alt="" data-full="${fullSrc}">` : '';
+    const itemClass = hasPhoto ? 'catitem has-photo' : 'catitem';
     if(!price){
-      return `<div class="catitem">${photo}<span class="catname">${name}</span></div>`;
+      return `<div class="${itemClass}">${photo}<span class="catname">${name}</span></div>`;
     }
     const id = 'c-' + slugify(name);
     CATALOG_ITEMS.push({id, name, price, unit});
-    return `<div class="catitem">${photo}<span class="catname">${name}</span><span class="catactions"><span class="catprice">${fmt(price)}/${unit}</span><button class="addbtn addbtn-sm" data-id="${id}">+ Ajouter</button></span></div>`;
+    return `<div class="${itemClass}">${photo}<span class="catname">${name}</span><span class="catactions"><span class="catprice">${fmt(price)}/${unit}</span><button class="addbtn addbtn-sm" data-id="${id}">+ Ajouter</button></span></div>`;
   }).join('')}</div>`;
   catalogWrap.appendChild(group);
 });
