@@ -237,9 +237,29 @@
   /* ---------- Product grid ---------- */
   .grid{
     max-width:1080px;margin:0 auto;
-    display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));
+    display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));
     gap:22px;
   }
+  .featured-card{
+    max-width:1080px;margin:0 auto 22px;
+    background:#F1E4C4;border:1.5px dashed var(--line);border-radius:3px;
+    display:grid;grid-template-columns:1.1fr 1fr;overflow:hidden;
+  }
+  .featured-card img{width:100%;height:100%;object-fit:cover;display:block;min-height:260px;}
+  .featured-card .featured-body{padding:28px 32px;display:flex;flex-direction:column;justify-content:center;gap:4px;position:relative;}
+  .featured-card .badge{
+    position:static;align-self:flex-start;margin-bottom:14px;
+    background:var(--oxblood);color:#fff;font-size:0.72rem;font-weight:700;
+    text-transform:uppercase;letter-spacing:0.04em;padding:5px 14px 6px 12px;border-radius:2px;
+  }
+  .featured-card h3{font-size:1.5rem;margin:0 0 12px;}
+  .featured-card .contents{font-size:0.92rem;opacity:0.85;padding-left:18px;margin:0 0 18px;}
+  .featured-card .pricerow{
+    display:flex;align-items:center;justify-content:space-between;
+    margin-top:20px;padding-top:16px;border-top:1px dashed var(--line);
+  }
+  .featured-card .price{font-family:'Fraunces',serif;font-weight:900;font-size:1.5rem;color:var(--oxblood);}
+  @media (max-width:700px){ .featured-card{grid-template-columns:1fr;} .featured-card img{min-height:200px;} }
   .card{
     background:
       repeating-linear-gradient(120deg, rgba(74,58,40,0.05) 0px, rgba(74,58,40,0.05) 1px, transparent 1px, transparent 4px),
@@ -545,8 +565,9 @@
 <section id="boites">
   <div class="section-head">
     <h2>Nos boîtes économiques</h2>
-    <p>Contenu fixe, prix fixe. Ajoutez ce qu'il vous faut au panier, on prépare tout pour la date de cueillette.</p>
+    <p>Zéro prise de tête. Vous choisissez la boîte qui vous ressemble, on s'occupe de tout le reste.</p>
   </div>
+  <div id="featuredBox"></div>
   <div class="grid" id="productGrid"></div>
 </section>
 
@@ -850,8 +871,26 @@ if(marqueeTrack){
 }
 
 // ---------- Render products ----------
+const featuredBoxEl = document.getElementById('featuredBox');
+const featured = PRODUCTS.find(p=>p.id==='dumois');
+if(featured && featuredBoxEl){
+  featuredBoxEl.innerHTML = `
+    <div class="featured-card">
+      <img src="${BOX_PHOTOS[featured.id]}" alt="${featured.name}">
+      <div class="featured-body">
+        ${featured.badge ? `<span class="badge">${featured.badge}</span>` : ''}
+        <h3>${featured.name}</h3>
+        <ul class="contents">${featured.items.map(i=>`<li>${i}</li>`).join('')}</ul>
+        <div class="pricerow">
+          <span class="price">${fmt(featured.price)}</span>
+          <button class="addbtn" data-id="${featured.id}">+ Ajouter</button>
+        </div>
+      </div>
+    </div>
+  `;
+}
 const grid = document.getElementById('productGrid');
-PRODUCTS.filter(p=>p.active!==false).forEach(p=>{
+PRODUCTS.filter(p=>p.active!==false && p.id!=='dumois').forEach(p=>{
   const card = document.createElement('div');
   card.className = 'card';
   card.innerHTML = `
